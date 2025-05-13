@@ -24,7 +24,7 @@ class UserResource extends Resource
     protected static ?int $navigationSort = 1;
 
     protected static ?string $navigationGroup = 'User Management';
-    
+
     public static function form(Form $form): Form
     {
         return $form
@@ -40,10 +40,16 @@ class UserResource extends Resource
                     Forms\Components\DateTimePicker::make('email_verified_at'),
                     Forms\Components\TextInput::make('password')
                         ->password()
-                        ->dehydrateStateUsing(fn(string $state): string => Hash ::make($state))
+                        ->dehydrateStateUsing(fn(string $state): string => Hash::make($state))
                         ->dehydrated(fn(?string $state): bool => filled($state))
-                         ->required(fn (string $operation): bool => $operation === 'create')
+                        ->required(fn(string $operation): bool => $operation === 'create')
                         ->maxLength(255),
+                    Forms\Components\Select::make('roles')
+                        ->multiple()
+                        ->relationship('roles', 'name')->preload(),
+                    Forms\Components\Select::make('permissions')
+                        ->multiple()
+                        ->relationship('permissions', 'name')->preload()
                 ])->columns(2)
             ]);
     }

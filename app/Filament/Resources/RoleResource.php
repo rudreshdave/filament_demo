@@ -35,10 +35,11 @@ class RoleResource extends Resource
                 Card::make()->schema([
                     TextInput::make('name')
                         ->minLength(2)
-                        ->maxLength(255),
-                    Select::make('prmiddions')
-                    ->multiple()
-    ->relationship(name: 'permissions', titleAttribute: 'name')->preload()
+                        ->maxLength(255)
+                        ->unique(ignoreRecord: true),
+                    Select::make('permissions')
+                        ->multiple()
+                        ->relationship(name: 'permissions', titleAttribute: 'name')->preload()
                 ])
             ]);
     }
@@ -47,7 +48,9 @@ class RoleResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')->searchable()
+                TextColumn::make('id')->sortable(),
+                TextColumn::make('name')->searchable(),
+                TextColumn::make('created_at')->dateTime('d-M-Y')->sortable()
             ])
             ->filters([
                 //
@@ -77,5 +80,10 @@ class RoleResource extends Resource
             'create' => Pages\CreateRole::route('/create'),
             'edit' => Pages\EditRole::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->where('name', '!=', 'Admin');
     }
 }
